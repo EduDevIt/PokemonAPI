@@ -1,0 +1,4 @@
+CREATE TABLE Table_Test_1 (
+    AN8 VARCHAR(8),
+    DL01 VARCHAR(30)
+);

@@ -12,25 +12,10 @@ import java.util.Optional;
 @RequestMapping("/pokemonAPIarray")
 public class Controller {
 
-    private List<Pokemon> pokemonArray = new ArrayList<>();
 
-    public Controller(){
-        pokemonArray.add(new Pokemon("Bulbasaur", "1", "Grass", "Poison"));
-        pokemonArray.add(new Pokemon("Charmander", "4", "Fire", ""));
-        pokemonArray.add(new Pokemon("Squirtle", "7", "Water", ""));
-        pokemonArray.add(new Pokemon("Pikachu", "25", "Electric", ""));
-        pokemonArray.add(new Pokemon("Jigglypuff", "39", "Normal", "Fairy"));
-        pokemonArray.add(new Pokemon("Meowth", "52", "Normal", ""));
-        pokemonArray.add(new Pokemon("Psyduck", "54", "Water", ""));
-        pokemonArray.add(new Pokemon("Machop", "66", "Fighting", ""));
-        pokemonArray.add(new Pokemon("Geodude", "74", "Rock", "Ground"));
-        pokemonArray.add(new Pokemon("Magnemite", "81", "Electric", "Steel"));
-        pokemonArray.add(new Pokemon("Onix", "95", "Rock", "Ground"));
-        pokemonArray.add(new Pokemon("Cubone", "104", "Ground", ""));
-        pokemonArray.add(new Pokemon("Koffing", "109", "Poison", ""));
-        pokemonArray.add(new Pokemon("Rhyhorn", "111", "Ground", "Rock"));
-        pokemonArray.add(new Pokemon("Magikarp", "129", "Water", ""));
-    }
+    private PokemonService pokemonService;
+
+
 
     @GetMapping()
     public ResponseEntity<List<Pokemon>> getAll(){
@@ -47,6 +32,7 @@ public class Controller {
                 return ResponseEntity.ok("Pokemon updated succesfully");
             }
         }
+        pokemonService.update(updatedPokemon,id);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon not found");
     }
 
@@ -61,7 +47,7 @@ public class Controller {
 
     @PostMapping()
     public ResponseEntity<String> create(@RequestBody Pokemon newPokemon) {
-        pokemonArray.add(newPokemon);
+        pokemonService.add(newPokemon);
         return ResponseEntity.status(HttpStatus.CREATED).body("Pokemon added successfully!");
     }
 

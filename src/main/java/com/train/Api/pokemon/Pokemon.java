@@ -13,7 +13,9 @@ public class Pokemon {
         this.type1 = type1;
         this.type2 = type2;
     }
+    public Pokemon(){
 
+    }
     // Getters y Setters
     public String getName() {
         return name;

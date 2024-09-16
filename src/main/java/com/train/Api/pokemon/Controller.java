@@ -1,19 +1,15 @@
 package com.train.Api.pokemon;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Iterator;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/pokemonAPIarray/")
+@RequestMapping("/pokemonAPIarray")
 public class Controller {
 
     private List<Pokemon> pokemonArray = new ArrayList<>();
@@ -36,61 +32,53 @@ public class Controller {
         pokemonArray.add(new Pokemon("Magikarp", "129", "Water", ""));
     }
 
-
-
-    @GetMapping("/list")
-    public ResponseEntity<String> getList(){
-        String lista="";
-        for (Pokemon i : pokemonArray){
-            lista= lista + i.toString() + "\n";
-        }
-        return ResponseEntity.ok(lista);
-
+    @GetMapping()
+    public ResponseEntity<List<Pokemon>> getAll(){
+        return ResponseEntity.ok(pokemonArray);
     }
-    @PutMapping("/update/{id}")
-    public ResponseEntity<String> updatePokemon(@PathVariable String id, @RequestBody Pokemon updatedPokemon){
-        for (Pokemon i : pokemonArray) {
-            if (i.getId().equals(id)) {
-                i.setName(updatedPokemon.getName());
-                i.setType1(updatedPokemon.getType1());
-                i.setType2(updatedPokemon.getType2());
+
+    @PutMapping("/{id}")
+    public ResponseEntity<String> update(@PathVariable String id, @RequestBody Pokemon updatedPokemon){
+        for (Pokemon pokemon : pokemonArray) {
+            if (pokemon.getId().equals(id)) {
+                pokemon.setName(updatedPokemon.getName());
+                pokemon.setType1(updatedPokemon.getType1());
+                pokemon.setType2(updatedPokemon.getType2());
                 return ResponseEntity.ok("Pokemon updated succesfully");
             }
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon not found");
     }
 
-
-    @DeleteMapping("/delete/{pokemon}")
-    public ResponseEntity<String> deletePokemon(@PathVariable String pokemon){
-        Iterator<Pokemon> iterator = pokemonArray.iterator();
-        while (iterator.hasNext()){
-            Pokemon i = iterator.next();
-            if (i.getName().equalsIgnoreCase(pokemon)){
-                iterator.remove();
-                return ResponseEntity.ok("Pokemon deleted succesfully");
-            }
+    @DeleteMapping("/{pokemon}")
+    public ResponseEntity<String> delete(@PathVariable String pokemon){
+        boolean removed = pokemonArray.removeIf(element -> element.getName().equalsIgnoreCase(pokemon));
+        if (removed){
+            return ResponseEntity.ok("Pokemon deleted succesfully");
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon not found");
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<String> addPokemon(@RequestBody Pokemon newPokemon) {
+    @PostMapping()
+    public ResponseEntity<String> create(@RequestBody Pokemon newPokemon) {
         pokemonArray.add(newPokemon);
         return ResponseEntity.status(HttpStatus.CREATED).body("Pokemon added successfully!");
     }
 
-    @GetMapping("/data/{pokemon}")
-    public ResponseEntity<String> infoPokemon(@PathVariable String pokemon) {
-        for (Pokemon i : pokemonArray){
-            if (i.getName().toLowerCase().equals(pokemon.toLowerCase())){
-                return ResponseEntity.ok(i.toString());
-            }
-        }
-        return ResponseEntity.ok("The pokemon doesn't exist in our database");
+    @GetMapping("/{pokemon}")
+    public ResponseEntity<Pokemon> infoPokemon(@PathVariable String pokemon) {
+        return pokemonArray.stream()
+                .filter(element -> element.getName().equalsIgnoreCase(pokemon))
+                .findFirst()
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+
+
     }
 
-
+//crear una clase nueva que se llamara pokemon service. migrar la logica del array al pokemon service.
+    //tendra un metodo add delete create. y aqui llamaria al pokemon service
+    //ver inyeccion de depencias
 }
 
 
